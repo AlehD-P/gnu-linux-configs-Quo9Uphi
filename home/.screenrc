@@ -1,0 +1,47 @@
+# Change escape sequence (Ctrl+`)
+escape "^``"
+
+# Lock password
+password ***
+
+# Remove key bindings
+bind k
+bind Q
+# bind X
+bind ^k
+bind .
+bind ^\
+bind \\
+bind ^h
+bind h
+
+# Bind new commands
+bind K kill
+bind I login on
+bind O login off
+bind } history
+bind _ split
+
+# Bind new keys
+bindkey "^[[1;5D" focus left
+bindkey "^[[1;5C" focus right
+bindkey "^[[1;5A" focus up
+bindkey "^[[1;5B" focus down
+bindkey "^]" layout next
+
+# Load custom configs on request
+bind U source $HOME/.screenrc_user
+bind R source $HOME/.screenrc_admin
+
+# Setup scrolling
+# defscrollback 5000
+# termcapinfo xterm* ti@:te@
+# termcapinfo xterm* 'hs:ts=\E]2;:fs=07:ds=\E]2;screen07'
+
+# Enable mouse support
+mousetrack off
+
+# Highlighting
+# hardstatus off
+# caption always "%?%F%{= Kk}%:%{=u kR}%?  %h %-024=%{+b} %C%a %D %d %M %Y%{= db}" 
+# hardstatus alwayslastline "%{= kR} %-Lw%{=b Kk} %n%f %t %{-}%+Lw %=%{= dd}"

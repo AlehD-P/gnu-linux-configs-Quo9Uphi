@@ -1,0 +1,45 @@
+[ req ]
+default_bits        = 4096
+default_keyfile     = server.key
+distinguished_name  = subject
+req_extensions      = req_ext
+x509_extensions     = x509_ext
+string_mask         = utf8only
+
+[ subject ]
+countryName                 = Country Name (2 letter code)
+countryName_default         = AQ
+stateOrProvinceName         = State or Province Name (full name)
+stateOrProvinceName_default = Antarctica
+localityName                = Locality Name (eg, city)
+localityName_default        = South Pole
+organizationName            = Organization Name (eg, company)
+organizationName_default    = Penguin, LLC
+
+commonName                  = Common Name (e.g. server FQDN or YOUR name)
+commonName_default          = file-server.lan
+
+emailAddress                = Email Address
+emailAddress_default        = mail@penguin.aq
+
+[ x509_ext ]
+subjectKeyIdentifier        = hash
+authorityKeyIdentifier      = keyid,issuer
+basicConstraints            = CA:FALSE
+keyUsage                    = digitalSignature, keyEncipherment
+subjectAltName              = @alternate_names
+nsComment                   = "OpenSSL Generated Certificate"
+# extendedKeyUsage           = serverAuth, clientAuth
+
+[ req_ext ]
+subjectKeyIdentifier        = hash
+basicConstraints            = CA:FALSE
+keyUsage                    = digitalSignature, keyEncipherment
+subjectAltName              = @alternate_names
+nsComment                   = "OpenSSL Generated Certificate"
+# extendedKeyUsage           = serverAuth, clientAuth
+
+[ alternate_names ]
+IP,1        = 127.0.0.1
+DNS.1       = file-server.lan
+DNS.2       = www.file-server.lan
