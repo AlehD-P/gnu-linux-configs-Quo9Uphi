@@ -1,15 +1,36 @@
 " =========================
+" Leader key (practical default)
+" =========================
+
+let mapleader=" "
+
+" =========================
+" Plugins and additions
+" =========================
+
+filetype plugin indent on
+
+" =========================
 " Basic editor behavior
 " =========================
 
-" Enable mouse usage (all modes)
-set mouse=a
-
 " Tabs defaults
 set tabstop=4
-set softtabstop=0
+set softtabstop=4
 set shiftwidth=4
-set noexpandtab
+set expandtab
+
+" Filetype-specific overrides
+augroup indentation_rules
+  autocmd!
+  
+  " Bash / shell scripts → keep real tabs
+  autocmd FileType sh,bash,zsh setlocal noexpandtab
+  
+  " Makefiles → must use real tabs
+  autocmd FileType make setlocal noexpandtab softtabstop=0
+  
+augroup END
 
 " IDE options
 set number
@@ -17,18 +38,7 @@ set copyindent
 set preserveindent
 
 " Keep the cursor vertically centered when possible
-set scrolloff=10
-
-" Show matching brackets
-set showmatch
-
-" Cursor line: subtle background
-set cursorline
-highlight CursorLine cterm=NONE ctermbg=236 guibg=#2a2a2a
-
-" Cursor column: slightly different shade to distinguish
-set cursorcolumn
-highlight CursorColumn cterm=NONE ctermbg=235 guibg=#242424
+set scrolloff=15
 
 " Highlight search matches
 set hlsearch
@@ -45,6 +55,10 @@ highlight IncSearch
       \ ctermbg=240
       \ guifg=#000000
       \ guibg=#444444
+
+" Ensure quickfix window opens automatically
+set errorformat=%f:%l:%c:\ %m
+set errorformat+=%f:%l:\ %m
 
 " =========================
 " Syntax
@@ -63,10 +77,43 @@ augroup python_indentation
 augroup END
 
 " =========================
-" Leader key (practical default)
+" Visuals
 " =========================
 
-let mapleader=" "
+" Tab visualization
+set listchars=tab:▸\ ,trail:·,nbsp:⎵,extends:…,precedes:…,eol:↲
+
+" Cursor line: subtle background
+set cursorline
+highlight CursorLine cterm=NONE ctermbg=236 guibg=#2a2a2a
+
+" Cursor column: slightly different shade to distinguish
+set cursorcolumn
+highlight CursorColumn cterm=NONE ctermbg=235 guibg=#242424
+
+" Special characters
+highlight SpecialKey
+      \ cterm=NONE
+      \ ctermfg=250
+      \ ctermbg=NONE
+      \ guifg=#c0c0c0
+      \ guibg=NONE
+
+" Non-printable characters
+highlight NonText
+      \ cterm=NONE
+      \ ctermfg=250
+      \ ctermbg=NONE
+      \ guifg=#c0c0c0
+      \ guibg=NONE
+
+" Reapply after colorscheme changes
+augroup listchars_color
+  autocmd!
+  autocmd ColorScheme *
+    \ highlight SpecialKey cterm=NONE ctermfg=250 guifg=#c0c0c0 |
+    \ highlight NonText    cterm=NONE ctermfg=250 guifg=#c0c0c0
+augroup END
 
 " =========================
 " Hotkeys (toggles)
@@ -77,6 +124,9 @@ nnoremap <leader>n :set number!<CR>
 
 " Toggle cursor line + column highlight (normal mode)
 nnoremap <leader>c :set cursorline! cursorcolumn!<CR>
+
+" Toggle special characters
+nnoremap <leader>l :set list!<CR>
 
 " Open new horizontal window (split)
 nnoremap <leader>w :split<CR>
@@ -95,6 +145,20 @@ nnoremap <leader><Tab> <C-w>w
 
 " Clear search highlighting quickly
 nnoremap <leader>/ :nohlsearch<CR>
+
+" Quickfix navigation shortcuts
+
+" Next / previous quickfix item
+nnoremap <leader>qn :cnext<CR>
+nnoremap <leader>qp :cprev<CR>
+
+" First / last quickfix item
+nnoremap <leader>qf :cfirst<CR>
+nnoremap <leader>ql :clast<CR>
+
+" Open / close quickfix window
+nnoremap <leader>qo :copen<CR>
+nnoremap <leader>qc :cclose<CR>
 
 " =========================
 " Status line
@@ -126,7 +190,6 @@ highlight StatusLineNC
       \ guifg=#909090
       \ guibg=#262626
 
-
 " Reapply status line styling after colorscheme changes
 augroup statusline_colors
   autocmd!
@@ -146,3 +209,26 @@ augroup restore_cursor
         \   execute "normal! g`\"" |
         \ endif
 augroup END
+
+" =========================
+" Linters integration
+" =========================
+
+augroup yamllint_integration
+  autocmd!
+  " Only for YAML files
+  autocmd FileType yaml nnoremap <buffer> <leader>y :call RunYamllint()<CR>
+augroup END
+
+function! RunYamllint()
+  if !executable('yamllint')
+    echo "yamllint not found in PATH"
+    return
+  endif
+  silent cexpr system('yamllint -f parsable ' . shellescape(expand('%:p')))
+  if len(getqflist()) > 0
+    copen
+  else
+    echo "No yamllint issues"
+  endif
+endfunction
